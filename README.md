@@ -1,34 +1,90 @@
 # solodev
 
-> Three Claude Code skills for solo developers who want **planning > vibes** without the enterprise ceremony.
+> **Plan > Vibes.** Three Claude Code skills for solo devs who refuse to vibe-code and refuse enterprise ceremony.
 
 ```
-ideia bruta
-   ↓
-/dev-brainstorm   →  .plans/<feature>/BRIEF.md
-   ↓                  (problema, goals, non-goals, decisões, edge cases)
-/dev-plan         →  .plans/<feature>/PLAN.md
-   ↓                  (tasks atômicas, must-haves, reset protocol)
-[reset context if you want — PLAN.md is self-sufficient]
-   ↓
-/dev-coding       →  executes task-by-task + SUMMARY.md
-                      (TDD where it pays off, HITL checkpoints, diagnose loop)
+/dev-brainstorm   →   /dev-plan   →   /dev-coding
+   BRIEF.md            PLAN.md         executes + verifies
 ```
 
 ---
 
-## Why this exists
+## The fusion
 
-AI coding assistants are powerful but unpredictable when requirements live only in chat history. Most solutions go too far the other direction — **enterprise-grade frameworks with phases, sprints, epics, OKRs, sub-rituals** — designed for teams of 20, not for one person shipping fast.
+solodev is not a new framework. It's a **distillation** — four of the best dev-discipline projects for AI coding, compressed into three lean skills that fit one person shipping fast.
 
-**solodev** is the lean middle: just enough structure to keep the AI honest, nothing more.
+```mermaid
+flowchart TB
+    MP["<b>Matt Pocock — skills</b><br/><sub>grilling · TDD vertical<br/>diagnose loop · to-prd · to-issues</sub>"]
+    OS["<b>OpenSpec</b><br/><sub>spec-driven philosophy<br/>BRIEF → PLAN → archive lifecycle</sub>"]
+    GSD["<b>get-shit-done</b><br/><sub>atomic task frontmatter<br/>must-haves · checkpoints · read_first</sub>"]
+    ECC["<b>everything-claude-code</b><br/><sub>verification-loop · search-first<br/>anti-vibe patterns catalog</sub>"]
+    KAR["<b>Karpathy rules</b><br/><sub>think before coding<br/>surgical changes · no speculation</sub>"]
 
-- **No phases, no sprints, no epics.** Tasks and subtasks.
-- **No code in the plan.** Decisions, contracts, verifiable acceptance criteria.
-- **Vertical slices.** Each task cuts through ALL layers (schema → API → UI → test), not "all the models first".
-- **Reset-friendly.** A new Claude Code session reading only the `PLAN.md` + your project's `CLAUDE.md` can resume work without context loss.
-- **Anti-vibe.** Every acceptance criterion is grep/build/test verifiable. No "works correctly" allowed.
-- **Karpathy minimum.** Don't invent abstractions for hypothetical futures. Don't refactor adjacent code. Surgery, not reform.
+    MP   --discipline--> SOLO
+    OS   --philosophy--> SOLO
+    GSD  --structure--> SOLO
+    ECC  --catalog--> SOLO
+    KAR  --DNA--> SOLO
+
+    SOLO(("<b>solodev</b>"))
+
+    SOLO --> B["/dev-brainstorm"]
+    SOLO --> P["/dev-plan"]
+    SOLO --> C["/dev-coding"]
+
+    style SOLO fill:#0ea5e9,stroke:#0369a1,stroke-width:3px,color:#fff
+    style B fill:#f8fafc,stroke:#0ea5e9,stroke-width:1px,color:#0f172a
+    style P fill:#f8fafc,stroke:#0ea5e9,stroke-width:1px,color:#0f172a
+    style C fill:#f8fafc,stroke:#0ea5e9,stroke-width:1px,color:#0f172a
+```
+
+---
+
+## Built for one person, not twenty
+
+Most AI dev frameworks were written for **teams**: phases, sprints, epics, OKRs, sub-rituals, multi-agent orchestration, parallel execution waves, integration officers. You are not twenty people. You are one person shipping a feature this afternoon.
+
+**solodev removes the ceremony.** What's left is the smallest set of disciplines that consistently prevents AI from making you regret asking it to code:
+
+| You want | solodev gives you | We dropped |
+|---|---|---|
+| Stress-test the idea | `/dev-brainstorm` — 1 question at a time, with recommendation | Persona workshops, opportunity sizing |
+| Plan that survives reset | `/dev-plan` — atomic tasks, verifiable acceptance, vertical slices | Phases, milestones, wave scheduling, parallel agent pools |
+| Execute reliably | `/dev-coding` — TDD where it pays, diagnose loop when stuck | DAG orchestrators, multi-agent supervisors, agent boards |
+
+### The over-engineering tax (and why we refuse to pay it)
+
+Solo devs lose more time to **planning theater** than to bad code. Symptoms you'll recognize:
+
+- BRD → PRD → TDD → ADR → RFC → SDS for a CRUD endpoint
+- 14-page spec where 2 paragraphs would land the same outcome
+- "Phase 3 of 7" for a feature that could ship Friday
+- Backlog grooming for a backlog you alone wrote yesterday
+- A `must_haves` checklist with 30 items, of which 25 are obvious to anyone reading the code
+
+**The 9 vs 10 rule:** a 9/10 implementation shipped today compounds. A 10/10 plan that ships in three weeks rots. Solo devs win on velocity, not polish. solodev biases every default toward the 9.
+
+### What stayed
+
+- **One question at a time** with a recommendation — never ten at once, never silent assumptions (Karpathy)
+- **No code in the plan** — decisions, contracts, verifiable acceptance criteria; code lives in code
+- **Vertical slices** — each task cuts schema → API → UI → test in a thin slice, not "all the models first"
+- **Reset-friendly** — drop the session, read the `PLAN.md`, resume. Auto-sufficient on purpose.
+- **Verify before done** — every acceptance criterion is grep/build/test-able; no "works correctly" allowed
+- **Surgical changes** — touch what was asked; don't refactor adjacent code; don't add abstractions for hypothetical futures
+
+### What we cut
+
+- ❌ Phases, sprints, epics, OKRs (you have tasks and subtasks)
+- ❌ Wave-based parallel execution (you're one person — there is no "wave 2")
+- ❌ Multi-agent orchestration with shared state machines (overkill for solo)
+- ❌ Goal trees with 30 must-have rows (3–5 verifiable truths is enough)
+- ❌ SUMMARY chaining between adjacent plans (false dependencies)
+- ❌ User-setup documents separated from the plan (just put it inline)
+- ❌ Spec-kit-style rigid phase gates (iterate, don't waterfall)
+
+---
 
 ## The three skills
 
@@ -54,116 +110,75 @@ Executes the `PLAN.md` task-by-task. Reads `read_first` before touching anything
 
 ## Install
 
-### Global (recommended for solo devs — use from any project)
-
 ```bash
 git clone https://github.com/calneymgp/solodev.git
-cd solodev && ./install.sh
+cd solodev && ./install.sh             # global   → ~/.claude/skills/
+# or
+cd solodev && ./install.sh --project   # project  → ./.claude/skills/
 ```
 
-Then in any Claude Code session: `/dev-brainstorm`, `/dev-plan`, `/dev-coding`.
+Open any Claude Code session and type `/` — the three skills appear in autocomplete.
 
-### Per-project
+## Workflow
 
-```bash
-git clone https://github.com/calneymgp/solodev.git
-cd solodev && ./install.sh --project
+```
+1. > /dev-brainstorm
+   Claude asks one question at a time with a recommendation.
+   .plans/<feature>/BRIEF.md is written live.
+
+2. > /dev-plan
+   Reads BRIEF + your CLAUDE.md + codebase, writes PLAN.md.
+   Atomic tasks, vertical slices, must-haves, reset protocol.
+
+3. > /clear  (optional — reset context)
+   PLAN.md is auto-sufficient.
+
+4. > /dev-coding
+   Picks next pending task, reads read_first, applies action,
+   verifies acceptance, marks [x], moves on. Diagnose loop on failure.
 ```
 
-### Verify
-
-In Claude Code, type `/` and you should see the three skills listed in autocomplete.
-
----
-
-## Suggested workflow
-
-```bash
-# 1. New feature idea — stress-test it
-> /dev-brainstorm
-
-# Claude asks one question at a time, each with a recommendation.
-# As you decide, BRIEF.md is written/updated live at .plans/<feature>/BRIEF.md
-# When the BRIEF is closed:
-
-# 2. Build the atomic plan
-> /dev-plan
-
-# Claude reads BRIEF + your project's CLAUDE.md + codebase, then writes PLAN.md
-# with tasks, vertical slices, must-haves, reset protocol.
-
-# 3. (Optional) Reset context
-# /clear or new session — PLAN.md is self-sufficient.
-
-# 4. Execute task-by-task
-> /dev-coding
-
-# Reads PLAN.md, picks next pending task, reads its read_first files,
-# applies action, verifies acceptance, marks [x], moves on.
-```
-
----
-
-## File outputs
+Outputs live in:
 
 ```
 .plans/<feature-slug>/
-├── BRIEF.md          # output of /dev-brainstorm — optional
-├── PLAN.md           # output of /dev-plan — source of truth for /dev-coding
-├── DISCOVERY.md      # optional, when library/API research was needed
-└── SUMMARY.md        # output of /dev-coding when feature is done — optional
+├── BRIEF.md          # /dev-brainstorm (optional)
+├── PLAN.md           # /dev-plan       (source of truth)
+├── DISCOVERY.md      # /dev-plan       (when library research was needed)
+└── SUMMARY.md        # /dev-coding     (on completion, optional)
 ```
 
 ---
 
 ## Origin & credits
 
-These three skills are a **synthesis** of the best ideas from four leading dev-discipline frameworks for AI coding assistants. None of them fit a solo dev as-is — too heavy, too prescriptive, or too narrow. solodev cherry-picks what compounds and drops what doesn't.
+solodev cherry-picks what compounds across four leading dev-discipline projects for AI coding agents — and drops what doesn't fit a solo dev.
 
-### Inspired by
+- **[Matt Pocock — skills](https://github.com/mattpocock/skills)** — `grill-with-docs` taught the "one question at a time, with recommendation, explore-codebase-first" pattern. `tdd` taught vertical tracer bullets (never horizontal slicing). `diagnose` taught "build the feedback loop first — that IS the skill". `to-prd` and `to-issues` showed independently-grabbable vertical slices.
 
-- **[Matt Pocock — skills](https://github.com/mattpocock/skills)** — `grill-with-docs` taught the "one question at a time, with recommendation, explore codebase first" pattern. `tdd` taught the vertical-tracer-bullets-not-horizontal-slicing discipline. `diagnose` taught the "build the feedback loop first, that IS the skill" mindset. `to-prd` and `to-issues` showed how to break work into independently-grabbable vertical slices.
+- **[OpenSpec (Fission-AI)](https://github.com/Fission-AI/OpenSpec)** — `proposal.md` → `tasks.md` → archive lifecycle. The "agree before you build" anti-vibe philosophy.
 
-- **[OpenSpec (Fission-AI)](https://github.com/Fission-AI/OpenSpec)** — the `proposal.md` (Why → What Changes → Impact) → `tasks.md` (atomic checklist) → archive lifecycle. "Agree before you build" anti-vibe philosophy.
+- **[get-shit-done (gsd-build)](https://github.com/gsd-build/get-shit-done)** — per-task frontmatter (`type`, `slice`, `depends_on`, `files_modified`, `read_first`, `must_pass`), checkpoint patterns, and Must-Haves (truths/artifacts/key_links) for goal-backward verification. solodev keeps the spirit, drops the enterprise weight.
 
-- **[get-shit-done (gsd-build)](https://github.com/gsd-build/get-shit-done)** — per-task frontmatter (`type`, `slice`, `depends_on`, `files_modified`, `read_first`, `must_pass`), `checkpoint:decision` / `checkpoint:human-verify` patterns, Must-Haves (truths/artifacts/key_links) for goal-backward verification. solodev keeps the spirit, drops the enterprise weight (no phases/waves/SUMMARY chaining).
+- **[design.md (Google Labs)](https://github.com/google-labs-code/design.md)** — separate concern; not pulled in directly. Worth knowing about for UI-token-heavy work.
 
-- **[design.md (Google Labs)](https://github.com/google-labs-code/design.md)** — separate concern, not pulled in directly. Mentioned for completeness; useful for UI-token-heavy projects.
+- **[everything-claude-code (affaan-m)](https://github.com/affaan-m/everything-claude-code)** — the comprehensive catalog that helped identify which patterns actually compound (search-first, verification-loop) vs. which are framework-bound noise.
 
-- **[everything-claude-code (affaan-m)](https://github.com/affaan-m/everything-claude-code)** — the comprehensive catalog that helped identify which patterns actually compound (search-first, verification-loop) vs. which are language-bound or framework-bound.
-
-### Karpathy's anti-LLM rules in our DNA
+### Karpathy's anti-LLM rules baked in
 
 - **Think before coding** — surface ambiguity, never assume in silence
-- **Surgical changes** — touch only what was asked, don't refactor adjacent
-- **Goal-driven** — convert vague tasks to verifiable criteria before starting
+- **Surgical changes** — touch only what was asked
+- **Goal-driven** — vague tasks → verifiable criteria before starting
 - **No speculative engineering** — minimum code that solves the actual problem
 
 ---
 
 ## What this is NOT
 
-- **Not a framework.** No CLI, no daemon, no state machine, no version pinning. Just three markdown files Claude reads.
-- **Not a methodology.** Use it where it helps, ignore where it doesn't. Skip `/dev-brainstorm` if the BRIEF is already clear in your head. Skip Must-Haves on a 30-line script.
-- **Not for teams.** If you have 10 PMs and 30 engineers, you want the full GSD or OpenSpec. solodev is the lean version for one person.
-- **Not anti-AI.** It's pro-AI. The whole point is making AI coding agents reliable for solo devs by removing the "vibe" failure mode.
-
----
-
-## Anti-patterns these skills enforce
-
-- ❌ Asking 10 questions at once
-- ❌ Asking questions the codebase answers
-- ❌ Accepting vague terms ("the thing", "the system", "an account")
-- ❌ Putting code snippets in the plan (they go stale fast)
-- ❌ Horizontal task slicing ("all models first")
-- ❌ Vague acceptance ("works correctly", "user can use it")
-- ❌ Reflexive dependency chaining (`task-03 depends_on: [02]` just because it's later)
-- ❌ Marking done without verifying
-- ❌ Refactoring while RED
-- ❌ Mocking internal collaborators in tests
-- ❌ Skipping `read_first` ("I know what's there")
-- ❌ Inventing phases/sprints/epics when tasks + subtasks suffice
+- **Not a framework.** No CLI, no daemon, no state machine, no version pinning. Three markdown files Claude reads.
+- **Not a methodology.** Skip `/dev-brainstorm` if the brief is already clear in your head. Skip Must-Haves on a 30-line script. Use it where it pays.
+- **Not for teams.** Ten PMs + thirty engineers? Use full GSD or OpenSpec. solodev is the lean version for one person.
+- **Not anti-AI.** It's pro-AI — by removing the "vibe" failure mode that makes AI coding unreliable for solo devs.
 
 ---
 
@@ -173,10 +188,6 @@ Open an issue if a pattern bites you in real solo-dev usage. Improvements should
 
 PRs welcome if they reduce ceremony without sacrificing discipline.
 
----
-
 ## License
 
-MIT — see [LICENSE](LICENSE).
-
-If you fork/adapt: keep the credits section. The four upstream projects deserve the visibility.
+MIT — see [LICENSE](LICENSE). If you fork: keep the credits. The four upstream projects deserve the visibility.
