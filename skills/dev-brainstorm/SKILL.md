@@ -1,6 +1,6 @@
 ---
 name: dev-brainstorm
-description: Grilling estruturado para estressar uma ideia de feature ANTES de planejar. Faz uma pergunta por vez, sempre com recomendação inline, explora codebase para resolver dúvidas sem perguntar, captura decisões em BRIEF.md ao vivo. Use quando o usuário trouxer ideia bruta de feature, disser "/dev-brainstorm", "vamos brainstormar", "preciso estressar essa ideia", "me grilla", "vamos discutir antes de planejar", ou aparecer com um problema sem solução clara.
+description: Grilling estruturado para estressar uma ideia de feature ANTES de planejar. Traduz ideia falada/solta em requisitos, classifica o tamanho (S/M/L), faz uma pergunta por vez sempre com recomendação inline, explora o codebase para resolver dúvidas sem perguntar, captura decisões em BRIEF.md ao vivo e fecha com radar de riscos. Use quando o usuário trouxer ideia bruta de feature, disser "/dev-brainstorm", "vamos brainstormar", "preciso estressar essa ideia", "me grilla", "vamos discutir antes de planejar", ou aparecer com um problema sem solução clara.
 ---
 
 # /dev-brainstorm — Stress-test antes de planejar
@@ -13,7 +13,33 @@ Modo de **grilling estruturado**. Sua função não é codar nem escrever plano 
 
 ## Processo
 
-### 1. Capture a ideia bruta
+### 0. Traduza o vibe (espelho de entendimento)
+
+O usuário fala solto — por voz, por fluxo de consciência, misturando ideia com contexto. Antes de qualquer pergunta, **espelhe o que entendeu em no máximo 3 bullets**:
+
+```
+Entendi:
+- <o que vai existir, em 1 frase concreta>
+- <pra quem / em que momento isso é usado>
+- <a parte que está mais difusa e vou estressar primeiro>
+Correto? Algo essencial faltou?
+```
+
+Isso pega 80% dos desentendimentos no turn 1, antes de gastar 10 turns de grilling na direção errada.
+
+### 1. Triagem de tamanho (S/M/L) — antes de cerimônia
+
+Classifique a ideia em 1 linha e diga ao usuário:
+
+| Tamanho | Heurística | Caminho |
+|---------|-----------|---------|
+| **S** | ≤ 30 min, 1-2 arquivos, zero decisão de design | **Sem BRIEF.** Confirme em 2 bullets o que vai fazer e ofereça executar direto. Cerimônia aqui é imposto. |
+| **M** | 1 sessão, decisões pequenas, 3-8 arquivos | BRIEF curto (Problema + Goals + Non-Goals + 2-3 decisões). 3-6 perguntas no total. |
+| **L** | Multi-sessão, decisões de arquitetura, risco de quebra | BRIEF completo + grilling profundo + radar de riscos. |
+
+**Se o usuário discordar da triagem, ele vence.** Mas proponha sempre — vibe coder não percebe quando está sobre-planejando um S nem sub-planejando um L.
+
+### 2. Capture a ideia bruta
 
 Releia o que o usuário disse. Identifique em silêncio:
 - O que está claro
@@ -21,7 +47,7 @@ Releia o que o usuário disse. Identifique em silêncio:
 - O que parece óbvio mas pode ser armadilha
 - O que precisa de codebase exploration antes de virar pergunta
 
-### 2. Explore o codebase silenciosamente
+### 3. Explore o codebase silenciosamente
 
 **Se uma pergunta pode ser respondida lendo o código, leia o código em vez de perguntar.** Use Grep/Read para:
 - Localizar áreas tocadas pela feature
@@ -30,7 +56,7 @@ Releia o que o usuário disse. Identifique em silêncio:
 
 Se houver `CONTEXT.md`, `docs/schema_catalog.yaml`, ou glossário equivalente — **alinhe ao vocabulário existente.** Se o usuário usar termo conflitante, chame imediatamente: *"você disse 'cancelamento' mas o CONTEXT define como X — qual sentido?"*
 
-### 3. Pergunte uma por vez, com recomendação
+### 4. Pergunte uma por vez, com recomendação
 
 Formato de cada pergunta:
 
@@ -47,11 +73,24 @@ Regras:
 - **Walk down the tree.** Resolva dependências de decisão uma por vez — não pule branches sem fechar o anterior.
 - **Cross-reference com código.** Se o usuário disser X mas o código faz Y, surfacie: "você disse que cancela parcial, mas o código cancela a Order inteira — qual é o atual?"
 
-### 4. Atualize o BRIEF.md ao vivo
+### 5. Lente de produto (vibe coder esquece — você não)
+
+Em features com UI ou usuário final, cubra antes de fechar (1 pergunta cada, só as relevantes):
+- **Estado vazio:** o que aparece antes de existir dado?
+- **Estado de erro:** o que o usuário vê quando falha? (não "loga no console")
+- **Loading:** a operação demora? O que segura a percepção?
+- **Mobile/responsivo:** importa neste projeto?
+- **Quem NÃO pode ver/fazer isso:** existe permissão/tenant/RLS envolvido?
+
+### 6. Atualize o BRIEF.md ao vivo
 
 Quando uma decisão cristaliza, escreva no `.plans/<feature-slug>/BRIEF.md` imediatamente — não acumule pra escrever no final. Se o arquivo não existir, crie no primeiro insight. Formato em [BRIEF-TEMPLATE.md](BRIEF-TEMPLATE.md).
 
-### 5. Quando parar
+### 7. Radar de riscos (fechamento)
+
+Ao fechar o BRIEF, entregue um **top-3 "isso vai te morder"**: os 3 pontos com maior chance de doer durante implementação ou depois de shippar (migration sem rollback, contrato público mudando, race condition conhecida, dependência instável...). 1 linha cada, com mitigação sugerida. Vão para o BRIEF na seção `## Risk Radar`.
+
+### 8. Quando parar
 
 Pare quando:
 - Usuário disser "ok, suficiente" / "vamos pro plano" / equivalente
@@ -71,6 +110,7 @@ Pare quando:
 - **Decisões já tomadas** — com 1 linha de justificativa
 - **Open questions** — o que ainda precisa ser respondido (e por quem)
 - **Edge cases descobertos** — cenários que apareceram no stress-test
+- **Risk Radar** — top-3 riscos com mitigação
 
 ## Anti-padrões
 
@@ -82,9 +122,12 @@ Pare quando:
 - ❌ Escrever código de exemplo (isso é `/dev-coding`)
 - ❌ Discutir libs específicas em detalhe (deixa pra `/dev-plan` via discovery)
 - ❌ Documentar implementação no BRIEF (BRIEF é problema + escopo + decisões, NÃO implementação)
+- ❌ BRIEF completo para tarefa S (cerimônia é imposto — triagem existe pra isso)
 
 ## Próximo passo
 
 Quando o BRIEF estiver fechado, sugerir explicitamente:
 
 > *"BRIEF fechado em `.plans/<feature>/BRIEF.md`. Pronto pra `/dev-plan` transformar em PLAN.md atômico?"*
+
+Para tarefa **S** triada sem BRIEF: ofereça executar direto com checklist inline de 2-4 itens verificáveis.

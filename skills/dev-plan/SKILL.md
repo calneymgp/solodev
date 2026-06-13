@@ -1,6 +1,6 @@
 ---
 name: dev-plan
-description: Transforma um BRIEF (ou ideia já discutida) em PLAN.md atômico — tasks com critério verificável, vertical slices, must-haves observáveis. Sem código no plano. Auto-suficiente para reset de contexto — uma nova sessão consegue retomar lendo só o PLAN.md. Use quando o usuário disser "/dev-plan", "monta o plano", "transforma em plano", "vamos planejar", "quero plano atômico", "preciso resetar contexto e ter o plano pronto", ou pedir para estruturar tasks/subtasks após brainstorming.
+description: Transforma um BRIEF (ou ideia já discutida) em PLAN.md atômico — tasks com critério verificável, vertical slices, must-haves observáveis, esforço estimado e pontos de reset de contexto. Sem código no plano. Auto-suficiente para reset — uma nova sessão consegue retomar lendo só o PLAN.md. Use quando o usuário disser "/dev-plan", "monta o plano", "transforma em plano", "vamos planejar", "quero plano atômico", "preciso resetar contexto e ter o plano pronto", ou pedir para estruturar tasks/subtasks após brainstorming.
 ---
 
 # /dev-plan — Plano atômico, reset-friendly, sem código
@@ -59,23 +59,39 @@ Tipos de task:
 - `checkpoint:decision` — pausa para o user escolher entre opções
 - `checkpoint:human-verify` — pausa para o user testar visualmente / em produção
 
-### 5. Defina Must-Haves (goal-backward)
+Campos novos por task:
+- **effort:** `S` (minutos) | `M` (até ~1h) | `L` (1 sessão). Se alguma task é L, provavelmente deve ser dividida.
+- **rollback:** OBRIGATÓRIO para task que toca migration, contrato público, dado de produção ou config de deploy. 1 linha: como desfazer. Tasks sem risco: omitir o campo.
+
+### 5. Pontos de reset de contexto
+
+Contexto é recurso finito. Marque no plano onde vale resetar:
+
+- Após tasks que geram muito ruído de exploração (discovery, leitura de schema grande), insira a linha `> 🔄 bom ponto de /clear — o plano carrega o resto` entre tasks.
+- Heurística: feature com 6+ tasks → pelo menos 1 ponto de reset no meio.
+- O PLAN.md é a memória externa; a sessão é descartável. É isso que torna o reset barato.
+
+### 6. Defina Must-Haves (goal-backward)
 
 Após listar tasks, escreva o que precisa ser VERDADE quando tudo acabar. 3 categorias enxutas:
 - **Truths:** behaviors observáveis (ex.: *"user consegue criar X via UI"*)
 - **Artifacts:** arquivos que devem existir com substância real (ex.: `src/foo/bar.ts` > 30 linhas, exporta `[X, Y]`)
 - **Key Links:** conexões críticas via regex (ex.: `src/api/route.ts` faz `fetch('/api/x')` — regex `fetch\(['"]/api/x`)
 
+Mais uma, nova:
+- **Demo script:** 3-6 passos para demonstrar a feature funcionando em até 60 segundos (comando + o que observar). Se você não consegue escrever o demo script, a feature não tem critério de pronto observável — volte aos Goals.
+
 Por que isso importa: task ✅ ≠ goal ✅. Uma task "criar componente Chat" pode "completar" criando um placeholder vazio. Must-Haves capturam o que precisa funcionar de verdade.
 
-### 6. Escreva o PLAN.md
+### 7. Escreva o PLAN.md
 
 Use [PLAN-TEMPLATE.md](PLAN-TEMPLATE.md) como esqueleto. Resultado final em `.plans/<feature>/PLAN.md`.
 
-### 7. Quiz curto (1 turn)
+### 8. Quiz curto (1 turn)
 
 Antes de fechar, mostre ao usuário em 1 mensagem:
-- Lista numerada de tasks (título + tipo + 1 linha do que faz)
+- Lista numerada de tasks (título + tipo + effort + 1 linha do que faz)
+- Esforço total estimado (soma dos S/M/L)
 - Pergunta: *"Granularidade ok? Alguma task deveria ser dividida ou fundida? Algum critério de aceite que vai falhar como `must_pass`?"*
 
 Itere se necessário.
@@ -87,7 +103,7 @@ Itere se necessário.
 ├── BRIEF.md          (output de /dev-brainstorm — opcional)
 ├── PLAN.md           (output desta skill — source of truth)
 ├── DISCOVERY.md      (opcional, quando lib choice precisa de research)
-└── SUMMARY.md        (output de /dev-coding ao terminar — opcional)
+└── SUMMARY.md        (output de /dev-ship ao terminar)
 ```
 
 ## Critérios de aceite (escrever bem)
@@ -114,6 +130,7 @@ Mau critério de aceite:
 - ❌ **Fases/sprints/epics inventados** (solo dev — chama de task e subtask)
 - ❌ **Documentar coisa que CLAUDE.md já documenta** (DRY com o repo)
 - ❌ **Must-Haves de mais** (3-5 truths, não 20 — caso contrário não testamos no fim)
+- ❌ **Task com migration sem `rollback`** (o campo existe para te salvar às 23h de uma sexta)
 
 ## Plan Mode interaction
 
