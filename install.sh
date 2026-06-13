@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# solodev installer — copies three skills to your Claude Code skills directory.
+# solodev installer — copies the five skills to your Claude Code skills directory.
 # Usage:
 #   ./install.sh              → install globally (~/.claude/skills/)
 #   ./install.sh --project    → install for current project (.claude/skills/)
@@ -43,7 +43,7 @@ mkdir -p "$DEST"
 echo "→ Installing solodev skills to: $SCOPE"
 echo
 
-for skill in dev-brainstorm dev-plan dev-coding; do
+for skill in dev-brainstorm dev-plan dev-coding dev-fix dev-ship; do
   if [[ -d "$DEST/$skill" ]]; then
     echo "  ✓ $skill (overwriting existing)"
   else
@@ -58,5 +58,8 @@ echo "✓ Installed. In Claude Code, type / and you should see:"
 echo "    /dev-brainstorm"
 echo "    /dev-plan"
 echo "    /dev-coding"
+echo "    /dev-fix"
+echo "    /dev-ship"
 echo
-echo "Workflow: /dev-brainstorm → /dev-plan → [reset context] → /dev-coding"
+echo "Workflow: /dev-brainstorm → /dev-plan → [reset context] → /dev-coding → /dev-ship"
+echo "          /dev-fix any time a bug appears."
