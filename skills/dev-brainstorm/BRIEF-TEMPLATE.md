@@ -7,6 +7,7 @@ Salvar em `.plans/<feature-slug>/BRIEF.md`. Atualizar ao vivo durante o grilling
 ```markdown
 ---
 feature: <kebab-case-slug>
+size: S | M | L
 status: brainstorming | ready-for-plan
 created: YYYY-MM-DD
 last_updated: YYYY-MM-DD
@@ -34,9 +35,14 @@ last_updated: YYYY-MM-DD
 - **Compliance:** <LGPD, segurança, auditoria se aplica>
 - **Prazo:** <se houver>
 
+## Produto (se tem UI / usuário final)
+- **Estado vazio:** <o que aparece antes de existir dado>
+- **Estado de erro:** <o que o usuário vê quando falha>
+- **Loading:** <se a operação demora, o que segura a percepção>
+- **Permissões:** <quem NÃO pode ver/fazer isso>
+
 ## Glossário (termos do domínio)
 - **<Termo>:** <definição precisa neste contexto>
-- **<Termo>:** <definição>
 
 > Se o projeto tem CONTEXT.md ou glossário canônico, citar aqui em vez de redefinir.
 
@@ -48,26 +54,11 @@ last_updated: YYYY-MM-DD
 - **Q1:** <pergunta> — *proposed:* <resposta sugerida>
 - **Q2:** <pergunta> — *needs:* <user / discovery / código>
 
-## Edge cases identificados
-- <Cenário X — como reagir>
-- <Cenário Y — fora de escopo, justificar>
+## Edge cases descobertos
+- <cenário> → <comportamento decidido>
 
-## Áreas do código afetadas (suspeita)
-- `<path/area>` — <o que provavelmente muda aqui>
-- `<path/area>` — <o que provavelmente muda aqui>
-
-## Riscos
-- **<Risco>** — <impacto + mitigação proposta>
-
-## Próximo passo
-`/dev-plan` para transformar este BRIEF em PLAN.md atômico.
+## Risk Radar (top-3 "isso vai te morder")
+1. **<risco>** — mitigação: <1 linha>
+2. **<risco>** — mitigação: <1 linha>
+3. **<risco>** — mitigação: <1 linha>
 ```
-
----
-
-## Notas
-
-- **Atualizar ao vivo.** Cada decisão que cristaliza vira linha aqui imediatamente.
-- **Não documentar implementação.** Como vai ser construído fica no PLAN.md.
-- **Curto.** BRIEF é 1 página, no máximo 1.5. Se passou disso, ou já é PLAN.md ou tem ruído.
-- **Não duplicar CLAUDE.md.** Convenções já documentadas no projeto não entram aqui.

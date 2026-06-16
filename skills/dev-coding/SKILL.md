@@ -1,6 +1,6 @@
 ---
 name: dev-coding
-description: Executa um PLAN.md task por task — lê read_first, aplica a action, verifica acceptance, marca [x], faz commit atômico se aplicável. Suporta TDD vertical (tracer bullet red-green-refactor), checkpoints HITL, diagnose loop quando bug aparece. Roda Must-Haves no fim. Use quando o usuário disser "/dev-coding", "executa o plano", "implementa o PLAN.md", "next task", "continua do task-XX", ou pedir para começar/continuar implementação a partir de um PLAN.md existente.
+description: Executa um PLAN.md task por task — lê read_first, aplica a action, verifica acceptance, marca [x], faz commit atômico com referência à task. Mostra progresso (X/N), guarda de escopo quando a task infla, protocolo de drift quando a implementação diverge do plano. Suporta TDD vertical (tracer bullet red-green-refactor), checkpoints HITL. Use quando o usuário disser "/dev-coding", "executa o plano", "implementa o PLAN.md", "next task", "continua do task-XX", ou pedir para começar/continuar implementação a partir de um PLAN.md existente.
 ---
 
 # /dev-coding — Executar PLAN.md task por task
@@ -12,13 +12,22 @@ Esta skill assume que existe `.plans/<feature>/PLAN.md` produzido por `/dev-plan
 - Existe `<workspace>/.plans/<feature>/PLAN.md` (ou usuário aponta o path)
 - Você pode escrever e executar comandos no projeto
 
-Se não houver PLAN.md, **pare e sugira `/dev-plan` antes**.
+Se não houver PLAN.md, **pare e sugira `/dev-plan` antes**. Se for bug isolado sem plano, sugira `/dev-fix`.
+
+## Ritual de início de sessão
+
+Na primeira execução da sessão (e após cada reset de contexto):
+
+```
+PLAN: <feature> — [████████░░░░] 4/9 tasks ✅
+Próxima: task-05 (<tipo>, effort <S/M/L>) — <título>
+```
+
+1 mensagem, depois execute. O usuário sempre sabe onde está sem perguntar.
 
 ## Processo por task
 
 ### 1. Carregue o contexto mínimo
-
-Em cada execução (especialmente após reset de contexto):
 
 1. **Read** `.plans/<feature>/PLAN.md` integralmente
 2. **Read** `CLAUDE.md` do projeto + sub-CLAUDEs citados em `## Affected Areas`
@@ -58,70 +67,61 @@ Regras de teste:
 #### `type: checkpoint:decision`
 
 1. Pare a execução
-2. Apresente ao usuário (1 mensagem):
-   - O que precisa decidir (`decision`)
-   - Por que importa
-   - Opções com pros/cons
+2. Apresente ao usuário (1 mensagem): o que decidir (`decision`), por que importa, opções com pros/cons
 3. **Espere resposta.** Não escolha sozinho.
-4. Após escolha, registre no PLAN.md → seção `## Decisions` (adicionar entrada) e siga para próxima task.
+4. Após escolha, registre no PLAN.md → seção `## Decisions` e siga para próxima task.
 
 #### `type: checkpoint:human-verify`
 
 1. Execute o setup (start dev server, run command, etc.)
 2. Confirme que o ambiente está pronto (HTTP 200, port aberta, build ok)
-3. Apresente ao usuário:
-   - URL/comando para verificar
-   - 2-4 checks visuais/funcionais específicos
+3. Apresente: URL/comando para verificar + 2-4 checks visuais/funcionais específicos
 4. **Espere "approved" ou descrição do problema.**
-5. Se aprovado → marque `[x]`, mata o server se for o caso
-6. Se reprovado → entre em **diagnose loop** (seção abaixo)
+5. Se aprovado → marque `[x]`, mate o server se for o caso
+6. Se reprovado → mude para `/dev-fix` (diagnose loop) com o problema descrito
 
-### 3. Quando algo falha (diagnose loop)
+### 3. Guarda de escopo (a task inflou)
 
-Não tente "ajeitar e ver se passa". Siga disciplina:
+Pare e re-planeje quando, no meio de uma task:
+- Os arquivos tocados passam de **2× o `files_modified`** declarado
+- Aparece decisão de design que o plano não previu
+- A "correção rápida no caminho" está virando uma sub-feature
 
-**Phase 1 — Build feedback loop:** o teste/script que reproduz o bug em <10s e dá pass/fail determinístico. Isso é 90% do trabalho. Se o seu único loop é "rodar o app e clicar", invista em melhorá-lo.
+Protocolo: pare, escreva no PLAN.md o que descobriu, proponha: dividir a task / criar task nova / decisão de checkpoint. **Não engula escopo em silêncio** — é assim que plano vira ficção.
 
-**Phase 2 — Reproduzir:** rode o loop, observe a falha, confirme que é a MESMA que o usuário descreveu (não uma vizinha).
+### 4. Protocolo de drift (implementação divergiu do plano)
 
-**Phase 3 — Hipóteses ranqueadas:** 3-5 hipóteses, cada uma com predição falsificável ("se X é a causa, mexer em Y faz desaparecer"). Mostre a lista ao user antes de testar — eles ranqueiam mais rápido com domain knowledge.
+Quando a realidade do código contradiz o plano (API não existe como descrito, lib não suporta o approach, schema diferente):
 
-**Phase 4 — Instrumentar:** um probe por hipótese. Prefira debugger > log direcionado > log everything. Logs de debug com prefixo único (`[DEBUG-a4f2]`) pra cleanup grep no fim.
+1. **Não improvise em silêncio.** Pare a task.
+2. Registre em `## Decisions` do PLAN.md: o que o plano dizia → o que a realidade é → o novo approach (1-3 linhas).
+3. Se a mudança afeta tasks futuras, ajuste-as agora (títulos/acceptance), não depois.
+4. Continue. O PLAN.md deve sempre contar a verdade — uma sessão nova que ler o plano não pode herdar a mentira.
 
-**Phase 5 — Fix + regression test:** se há seam correto, escreva o teste de regressão ANTES do fix. Veja falhar → aplica fix → veja passar.
+### 5. Commits atômicos
 
-**Phase 6 — Cleanup:** remova logs `[DEBUG-*]`, delete probes, confirme que o repro original não reproduz mais.
+Ao fim de cada task verde (se o repo usa git e o usuário não disse o contrário):
+- 1 task = 1 commit. Mensagem: `<tipo>(<área>): <o que mudou> [task-XX]`
+- Tipos convencionais: `feat`, `fix`, `refactor`, `test`, `chore`, `docs`
+- Nunca `git add .` cego — adicione os arquivos da task
+- Hash vai para o `## Status Log`
 
-### 4. Atualize o PLAN.md ao vivo
+### 6. Atualize o PLAN.md ao vivo
 
-Cada task completed → mark `[x]` em cada `acceptance` + adicione entrada no `## Status Log`. Não acumule pra escrever no fim.
+Cada task completed → mark `[x]` em cada `acceptance` + entrada no `## Status Log`. Não acumule pra escrever no fim.
 
-### 5. Ao terminar a última task — Must-Haves verification
+### 7. Ao terminar a última task
 
-Antes de declarar a feature done:
+Não declare "pronto" aqui. Anuncie:
 
-1. **Truths:** cheque cada behavior listado (idealmente via smoke test, não inspeção visual)
-2. **Artifacts:** cheque cada arquivo (existe? min_lines? exports/contains corretos?)
-3. **Key Links:** rode os regex declarados — devem casar
+> *"Todas as tasks executadas. Rodando `/dev-ship` para verificação final, Must-Haves e fechamento?"*
 
-Se qualquer Must-Have falhar:
-- **Diagnosticar:** por que essa task "completed" não satisfez o goal?
-- **Criar fix-task ad-hoc** no PLAN.md (não mascarar)
-- Executar a fix-task → re-verify
-- Loop até todas Must-Haves passarem
-
-### 6. SUMMARY final
-
-Após Must-Haves verdes, opcionalmente escrever `.plans/<feature>/SUMMARY.md`:
-- O que foi entregue (1 parágrafo)
-- Commits envolvidos
-- Decisões tomadas durante execução que não estavam no plano
-- Coisas que apareceram e foram deferidas (open follow-ups)
+`/dev-ship` roda Must-Haves, demo script, revisão de diff e fechamento. Se o usuário recusar, rode ao menos os Must-Haves do PLAN.md você mesmo (Truths, Artifacts, Key Links) antes de declarar done — falhou algo, crie fix-task, não mascare.
 
 ## Princípios de execução (Karpathy)
 
 - **Cirurgia, não reforma.** Toque só o que a task pede. Não refatore código adjacente, não "melhore" formatação, não adicione tipos onde não havia. Se notar algo, mencione — não delete.
-- **Mínimo necessário.** Resolva a task. Não adicione abstração para uso único. Não preveja features futuras. Não engineering por hipotético.
+- **Mínimo necessário.** Resolva a task. Não adicione abstração para uso único. Não preveja features futuras.
 - **Critério de sucesso primeiro.** Antes de codar, releia `acceptance` e `must_pass`. Sua execução tem como meta acender esses verdes.
 - **Verify before done.** Rode o `must_pass`. Cheque cada `acceptance`. Não declare done com base em vibes.
 - **Sem error handling especulativo.** Só valide em boundary (input externo). Confie em garantias internas.
@@ -132,22 +132,20 @@ Após Must-Haves verdes, opcionalmente escrever `.plans/<feature>/SUMMARY.md`:
 - ❌ Escrever todos os testes TDD juntos antes de qualquer implementação
 - ❌ Refatorar enquanto está RED
 - ❌ Marcar `[x]` sem rodar a verificação
-- ❌ "Vou rodar o teste pra ver se passa" sem ter o critério claro do que deveria acontecer
 - ❌ Reescrever arquivo inteiro quando 5 linhas resolvem
 - ❌ Skip de hooks/lint/typecheck para "ir mais rápido"
 - ❌ Esconder falha mudando o teste em vez de corrigir o código
 - ❌ Mockar colaborador interno (vai dar verde com behavior quebrado)
 - ❌ Auto-aprovar checkpoint HITL ("não vou perguntar, já sei a resposta")
+- ❌ Engolir drift/escopo em silêncio (o plano precisa contar a verdade)
 
 ## Comunicação com o usuário
 
-**Antes de cada task:** 1 frase — "task-XX: vou tocar X, Y. Rode commit no fim? (y/n)" se ambíguo.
+**Antes de cada task:** 1 frase — "task-XX: vou tocar X, Y."
 
 **Durante:** silêncio relativo. Não narre tool calls. Comunique só obstáculo ou descoberta surpreendente.
 
 **Depois de cada task:** 2-3 linhas — o que mudou, o que verificou, próxima task ID.
-
-**No fim da feature:** SUMMARY conciso + opção de `/loop` se houver follow-ups que precisem virar nova feature.
 
 ## Quando parar e perguntar (mesmo em modo auto)
 

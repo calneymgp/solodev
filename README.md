@@ -1,17 +1,19 @@
 # solodev
 
-> **Plan > Vibes.** Three Claude Code skills for solo devs who refuse to vibe-code and refuse enterprise ceremony.
+> **Plan > Vibes.** Five Claude Code skills for solo devs who refuse to vibe-code and refuse enterprise ceremony.
 
 ```
-/dev-brainstorm   →   /dev-plan   →   /dev-coding
-   BRIEF.md            PLAN.md         executes + verifies
+/dev-brainstorm   →   /dev-plan   →   /dev-coding   →   /dev-ship
+   BRIEF.md            PLAN.md         executes          verifies + closes
+                                          │
+                                       /dev-fix  (a bug appears, any time)
 ```
 
 ---
 
 ## The fusion
 
-solodev is not a new framework. It's a **distillation** — four of the best dev-discipline projects for AI coding, compressed into three lean skills that fit one person shipping fast.
+solodev is not a new framework. It's a **distillation** — four of the best dev-discipline projects for AI coding, compressed into five lean skills that fit one person shipping fast.
 
 ```mermaid
 flowchart TB
@@ -32,11 +34,15 @@ flowchart TB
     SOLO --> B["/dev-brainstorm"]
     SOLO --> P["/dev-plan"]
     SOLO --> C["/dev-coding"]
+    SOLO --> F["/dev-fix"]
+    SOLO --> SH["/dev-ship"]
 
     style SOLO fill:#0ea5e9,stroke:#0369a1,stroke-width:3px,color:#fff
     style B fill:#f8fafc,stroke:#0ea5e9,stroke-width:1px,color:#0f172a
     style P fill:#f8fafc,stroke:#0ea5e9,stroke-width:1px,color:#0f172a
     style C fill:#f8fafc,stroke:#0ea5e9,stroke-width:1px,color:#0f172a
+    style F fill:#f8fafc,stroke:#0ea5e9,stroke-width:1px,color:#0f172a
+    style SH fill:#f8fafc,stroke:#0ea5e9,stroke-width:1px,color:#0f172a
 ```
 
 ---
@@ -51,7 +57,9 @@ Most AI dev frameworks were written for **teams**: phases, sprints, epics, OKRs,
 |---|---|---|
 | Stress-test the idea | `/dev-brainstorm` — 1 question at a time, with recommendation | Persona workshops, opportunity sizing |
 | Plan that survives reset | `/dev-plan` — atomic tasks, verifiable acceptance, vertical slices | Phases, milestones, wave scheduling, parallel agent pools |
-| Execute reliably | `/dev-coding` — TDD where it pays, diagnose loop when stuck | DAG orchestrators, multi-agent supervisors, agent boards |
+| Execute reliably | `/dev-coding` — TDD where it pays, delegates bugs and closeout | DAG orchestrators, multi-agent supervisors, agent boards |
+| Kill bugs with method | `/dev-fix` — feedback loop first, falsifiable hypotheses, one probe each | Trial-and-error, "change it and see if it passes" |
+| Ship what's verified | `/dev-ship` — Must-Haves, demo script, diff review, security pass | Release trains, change-advisory boards, sign-off matrices |
 
 ### The over-engineering tax (and why we refuse to pay it)
 
@@ -86,25 +94,37 @@ Solo devs lose more time to **planning theater** than to bad code. Symptoms you'
 
 ---
 
-## The three skills
+## The five skills
 
 ### `/dev-brainstorm`
 
-Structured grilling **before** you plan. One question at a time, always with a recommendation inline. Explores the codebase silently to answer what code can answer (so you're not babysitting). Builds a one-page `BRIEF.md` live as decisions crystallize.
+Structured grilling **before** you plan. Mirrors back what it understood (so a spoken, stream-of-consciousness idea doesn't get grilled in the wrong direction), triages the idea as S/M/L so a 30-minute task doesn't pay BRIEF tax, then asks one question at a time, always with a recommendation inline. Explores the codebase silently to answer what code can answer. Adds a product lens (empty/error/loading/permission states) and closes with a top-3 risk radar. Builds a one-page `BRIEF.md` live as decisions crystallize.
 
 **Use when:** you have a raw idea and want to stress-test it before committing to a plan.
 
 ### `/dev-plan`
 
-Transforms the `BRIEF.md` (or a finished discussion) into an atomic `PLAN.md`. Vertical slice tasks. Each task has: `type`, `slice`, `depends_on`, `read_first`, `files_modified`, `action`, `acceptance` (verifiable), `must_pass`. Plus a Must-Haves block (truths, artifacts, key links) that gets verified at the end. **No code in the plan.**
+Transforms the `BRIEF.md` (or a finished discussion) into an atomic `PLAN.md`. Vertical slice tasks. Each task has: `type`, `effort`, `slice`, `depends_on`, `read_first`, `files_modified`, `action`, `acceptance` (verifiable), `must_pass`, and `rollback` (for tasks that touch migrations, public contracts, or prod data). Plus a Must-Haves block (truths, artifacts, key links) and a 60-second demo script that get verified at the end, and `/clear` points marked between noisy tasks. **No code in the plan.**
 
 **Use when:** the BRIEF is closed and you want a reset-friendly execution document.
 
 ### `/dev-coding`
 
-Executes the `PLAN.md` task-by-task. Reads `read_first` before touching anything. Runs `must_pass` and verifies every acceptance criterion. Supports TDD (vertical tracer bullets, never horizontal slicing), HITL checkpoints (`checkpoint:decision`, `checkpoint:human-verify`), and a disciplined diagnose loop when bugs appear. Runs Must-Haves at the end — if anything fails, creates fix-tasks instead of declaring done.
+Executes the `PLAN.md` task-by-task. Opens each session with a progress line (`4/9 tasks ✅`). Reads `read_first` before touching anything. Runs `must_pass` and verifies every acceptance criterion. Supports TDD (vertical tracer bullets, never horizontal slicing), HITL checkpoints (`checkpoint:decision`, `checkpoint:human-verify`), a scope guard when a task balloons past its declared files, a drift protocol when reality contradicts the plan, and atomic commits per task. Delegates bugs to `/dev-fix` and closeout to `/dev-ship`.
 
 **Use when:** you have a `PLAN.md` and want to execute it without losing discipline.
+
+### `/dev-fix`
+
+The diagnose loop as its own skill — no plan required. Triages a bug as trivial / real / architectural, then for real bugs runs the six-phase loop: build a sub-10-second reproducible feedback loop first, rank falsifiable hypotheses, one probe per hypothesis, fix with a regression test, clean up the probes. Stops and asks after two cycles without progress instead of guessing a third time.
+
+**Use when:** something is broken — a stack trace, "it worked yesterday", or a failed `checkpoint:human-verify`.
+
+### `/dev-ship`
+
+Goal-backward verification before you call it done. Runs the full build/test/lint, the PLAN's Must-Haves, and the demo script; reviews the whole diff for leftovers (debug logs, dead code, empty catches) and author bugs; runs a security lens over touched files (hardcoded secrets, unvalidated external input, missing auth); writes `SUMMARY.md` and archives the plan. Also runs standalone as a disciplined pre-commit review.
+
+**Use when:** the last task is done, or you want a diff reviewed before committing.
 
 ---
 
@@ -117,25 +137,30 @@ cd solodev && ./install.sh             # global   → ~/.claude/skills/
 cd solodev && ./install.sh --project   # project  → ./.claude/skills/
 ```
 
-Open any Claude Code session and type `/` — the three skills appear in autocomplete.
+Open any Claude Code session and type `/` — the five skills appear in autocomplete.
 
 ## Workflow
 
 ```
 1. > /dev-brainstorm
-   Claude asks one question at a time with a recommendation.
-   .plans/<feature>/BRIEF.md is written live.
+   Mirrors the idea back, triages S/M/L, asks one question at a time
+   with a recommendation. .plans/<feature>/BRIEF.md is written live.
 
 2. > /dev-plan
    Reads BRIEF + your CLAUDE.md + codebase, writes PLAN.md.
-   Atomic tasks, vertical slices, must-haves, reset protocol.
+   Atomic tasks, vertical slices, effort, rollback, must-haves, demo script.
 
 3. > /clear  (optional — reset context)
    PLAN.md is auto-sufficient.
 
 4. > /dev-coding
    Picks next pending task, reads read_first, applies action,
-   verifies acceptance, marks [x], moves on. Diagnose loop on failure.
+   verifies acceptance, marks [x], commits, moves on.
+   → /dev-fix any time a bug appears.
+
+5. > /dev-ship
+   Build/test/lint + Must-Haves + demo + diff review + security pass.
+   Writes SUMMARY.md. Done means verified, not "looks done".
 ```
 
 Outputs live in:
@@ -145,7 +170,7 @@ Outputs live in:
 ├── BRIEF.md          # /dev-brainstorm (optional)
 ├── PLAN.md           # /dev-plan       (source of truth)
 ├── DISCOVERY.md      # /dev-plan       (when library research was needed)
-└── SUMMARY.md        # /dev-coding     (on completion, optional)
+└── SUMMARY.md        # /dev-ship       (on completion)
 ```
 
 ---
@@ -175,7 +200,7 @@ solodev cherry-picks what compounds across four leading dev-discipline projects 
 
 ## What this is NOT
 
-- **Not a framework.** No CLI, no daemon, no state machine, no version pinning. Three markdown files Claude reads.
+- **Not a framework.** No CLI, no daemon, no state machine, no version pinning. Five markdown files Claude reads.
 - **Not a methodology.** Skip `/dev-brainstorm` if the brief is already clear in your head. Skip Must-Haves on a 30-line script. Use it where it pays.
 - **Not for teams.** Ten PMs + thirty engineers? Use full GSD or OpenSpec. solodev is the lean version for one person.
 - **Not anti-AI.** It's pro-AI — by removing the "vibe" failure mode that makes AI coding unreliable for solo devs.

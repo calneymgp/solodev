@@ -78,8 +78,10 @@ brief: ./BRIEF.md         # se aplicável
 ### task-01: <verb + object — ação clara>
 
 - **type:** `auto` | `tdd` | `checkpoint:decision` | `checkpoint:human-verify`
+- **effort:** `S` | `M` | `L`  <!-- L provavelmente deveria ser dividida -->
 - **slice:** vertical (toca: <camadas: schema, API, UI, ...>)
 - **depends_on:** [] | [`task-XX`]
+- **rollback:** <OBRIGATÓRIO se toca migration/contrato público/dado de prod — 1 linha de como desfazer; omitir se sem risco>
 - **read_first:**
   - `<path>` — <por que ler antes>
   - `<path>` — <convenção do projeto a respeitar>
@@ -96,9 +98,12 @@ brief: ./BRIEF.md         # se aplicável
   - [ ] `<algo medível>` igual a `<valor exato>`
 - **must_pass:** `<comando(s) que devem rodar verde no fim>`
 
+> 🔄 bom ponto de /clear — o plano carrega o resto
+
 ### task-02: <verb + object>
 
 - **type:** `tdd`
+- **effort:** `M`
 - **slice:** vertical (toca: <camadas>)
 - **depends_on:** [`task-01`]
 - **read_first:**
@@ -151,6 +156,13 @@ Rodadas no fim por `/dev-coding`. Se qualquer uma falhar, geramos fix-tasks.
 ### Key Links (conexões críticas)
 - `<from>` → `<to>` via `<como>` — regex: `<padrão>`
 - `<from>` → `<to>` via `<como>` — regex: `<padrão>`
+
+### Demo Script (a feature em 60 segundos)
+1. `<comando>` — <o que observar>
+2. `<ação>` — <o que deve aparecer>
+3. `<verificação final>` — <valor/estado esperado>
+
+> Se não dá pra escrever o demo script, a feature não tem critério de pronto observável — volte aos Goals.
 
 ---
 
