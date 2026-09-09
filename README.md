@@ -104,7 +104,7 @@ Structured grilling **before** you plan. Mirrors back what it understood (so a s
 
 ### `/dev-plan`
 
-Transforms the `BRIEF.md` (or a finished discussion) into an atomic `PLAN.md`. Vertical slice tasks. Each task has: `type`, `effort`, `slice`, `depends_on`, `read_first`, `files_modified`, `action`, `acceptance` (verifiable), `must_pass`, and `rollback` (for tasks that touch migrations, public contracts, or prod data). Plus a Must-Haves block (truths, artifacts, key links) and a 60-second demo script that get verified at the end, and `/clear` points marked between noisy tasks. **No code in the plan.**
+Transforms the `BRIEF.md` (or a finished discussion) into an atomic `PLAN.md`. Vertical slice tasks. Each task has: `type`, `effort`, `slice`, `depends_on`, `read_first`, `files_modified`, `action`, `acceptance` (verifiable), `must_pass`, and `rollback` (for tasks that touch migrations, public contracts, or prod data). Plus a Must-Haves block (truths, artifacts, key links) and a 60-second demo script that get verified at the end, and `/clear` points marked between noisy tasks. Every material decision logs the choice plus the rejected alternative, and the plan ships as `draft` until an explicit `Approve` flips it to `ready`. **No code in the plan.**
 
 **Use when:** the BRIEF is closed and you want a reset-friendly execution document.
 

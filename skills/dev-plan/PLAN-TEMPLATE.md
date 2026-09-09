@@ -7,7 +7,8 @@ Salvar em `.plans/<feature-slug>/PLAN.md`. Auto-suficiente — sessão nova lend
 ```markdown
 ---
 feature: <kebab-case-slug>
-status: ready | in-progress | done
+status: draft | ready | in-progress | done
+type: feature | debug | migration
 created: YYYY-MM-DD
 brief: ./BRIEF.md         # se aplicável
 ---
@@ -49,15 +50,26 @@ brief: ./BRIEF.md         # se aplicável
 
 ## Decisions
 
-- **<Decisão 1>** — <1 linha do porquê>
-- **<Decisão 2>** — <1 linha do porquê>
-- **<Decisão 3>** — <1 linha do porquê>
+- **<Decisão 1>** — <1 linha do porquê> · descartada: <alternativa> (<motivo curto>)
+- **<Decisão 2>** — <1 linha do porquê> · descartada: <alternativa> (<motivo curto>)
+
+> Só decisões materiais (as mapeadas no passo 1). Padrão de projeto não entra aqui.
+
+## Risks
+
+- **Compat:** <o que quebra fora da feature, ou "nenhum">
+- **Abort:** <quando parar em vez de improvisar>
+- **Monitor:** <só migração/rollout — o que observar; omitir nos demais>
+
+> Sem risco sistêmico? Escreva `Nenhum — risco isolado por task (ver rollbacks)`. Não invente riscos.
 
 ## Discovery (opcional)
 
-> Apagar esta seção se a feature não precisou de research
+> Apagar esta seção se a feature não precisou de research.
+> Regra: fonte conta só se o conteúdo foi aberto e lido — resumo de busca não é evidência.
 
-**<Tópico investigado>** — Recomendação: `<resposta>`. Alternativas descartadas: `<B>` (razão), `<C>` (razão). Confiança: **high** | medium | low. Fontes: <doc oficial / Context7 / discussion link>.
+**<Tópico investigado>** — Recomendação: `<resposta>`. Descartadas: `<B>` (<motivo>), `<C>` (<motivo>). Confiança: **high** | medium | low. Inspecionadas: <URL exata 1>, <URL exata 2>.
+<Se conteúdo indisponível: ⚠️ condicional — <gap>.>
 
 ## Glossary (termos relevantes)
 
@@ -74,6 +86,8 @@ brief: ./BRIEF.md         # se aplicável
 ---
 
 ## Tasks
+
+> `type: debug` → itens viram hipóteses falsificáveis (hipótese / observação / evidência que confirma ou refuta). `type: migration` → tasks viram fases com gates + rollback obrigatório. Ver SKILL.md § Variantes.
 
 ### task-01: <verb + object — ação clara>
 
@@ -196,3 +210,5 @@ Atualizado por `/dev-coding` durante execução. Não preencher antes.
 - **`read_first` é proteção.** Executor não modifica arquivo sem entender o estado atual.
 - **must_pass dá rede de segurança.** Comando que rodaria em CI — se quebra, a task falhou.
 - **Vertical slice preferido.** task-01 = (schema + API + UI + test) de uma fatia da feature, NÃO task-01 = todos os schemas.
+- **`draft` até o Approve.** Salve com `status: draft`; só vire `ready` após aprovação explícita.
+- **Decisão boa cabe em 1 linha:** escolha + porquê + alternativa descartada. Se precisa de parágrafo, provavelmente são duas decisões.

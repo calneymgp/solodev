@@ -19,6 +19,10 @@ Esta skill produz `.plans/<feature>/PLAN.md` — um documento auto-suficiente. U
 
 5. **Karpathy mínimo necessário.** Não invente fases, milestones, OKRs, riscos especulativos. Se a feature cabe em 5 tasks, são 5 tasks — não invente sub-sprints.
 
+6. **Decisão sem evidência é chute.** Toda decisão material registra escolha + alternativa descartada + motivo em 1 linha. Por quê: o executor (você pós-`/clear`, ou outra sessão) não deve reinventar tradeoffs já feitos — nem descobrir tarde que havia uma opção melhor.
+
+7. **Nada executa sem Approve.** O plano é apresentado uma vez, o usuário responde `Approve` / `Changes` / `Cancel`, e só então alguém executa. Por quê: corrigir granularidade no plano custa 1 turn; corrigir no meio do `/dev-coding` custa a sessão.
+
 ## Processo
 
 ### 1. Carregue contexto
@@ -29,6 +33,8 @@ Em ordem:
 3. **Read** glossário/schema/CONTEXT do projeto se aplicável
 4. Se não houver BRIEF, faça grilling rápido (3-5 perguntas críticas) — modo `/dev-brainstorm` condensado
 
+Antes de explorar, **mapeie as decisões materiais**: quais escolhas (lib, API, approach, contrato, estratégia de migração) este plano precisa fechar? Só essas entram em `## Decisions` / `## Discovery`. Todo o resto é padrão do projeto — não documente o óbvio.
+
 ### 2. Explore o codebase (read-only)
 
 Grep + Read das áreas afetadas. Não escreva nada de código ainda — só entenda:
@@ -37,11 +43,15 @@ Grep + Read das áreas afetadas. Não escreva nada de código ainda — só ente
 - Dependências que vão ser tocadas
 - Riscos de quebra (migrations, contratos públicos, schemas)
 
+Trate um BRIEF ou plano anterior como navegação, não evidência: verifique no código atual o que eles afirmam antes de assumir como fato.
+
 ### 3. Discovery (quando há unknown)
 
 Se há decisão pendente sobre lib / API / approach que o BRIEF não fechou, ativar **discovery curto**:
 - 1-3 fontes: docs oficiais > Context7 > web search
-- Saída no fim da seção `## Discovery` do PLAN com: recomendação + 1-2 alternativas descartadas + nível de confiança (high/medium/low)
+- **Fonte conta só se inspecionada.** Resumo de busca, índice ou lista de candidatos localiza a fonte, não completa o research. Abra o conteúdo (doc oficial, repo, spec) e guarde a URL exata.
+- Saída na seção `## Discovery` do PLAN com: recomendação + 1-2 alternativas descartadas (com motivo) + nível de confiança (high/medium/low) + URLs inspecionadas
+- **Se o conteúdo estiver indisponível** (paywall, 404, fetch falhou): marque a recomendação como `⚠️ condicional` e registre o gap — não invente versão, API ou comportamento
 
 **Quando NÃO fazer discovery:** padrão já estabelecido no projeto, decisão trivial, ou o BRIEF já fechou.
 
@@ -83,18 +93,41 @@ Mais uma, nova:
 
 Por que isso importa: task ✅ ≠ goal ✅. Uma task "criar componente Chat" pode "completar" criando um placeholder vazio. Must-Haves capturam o que precisa funcionar de verdade.
 
-### 7. Escreva o PLAN.md
+### 7. Riscos globais (curto, 3-5 linhas)
 
-Use [PLAN-TEMPLATE.md](PLAN-TEMPLATE.md) como esqueleto. Resultado final em `.plans/<feature>/PLAN.md`.
+Além do `rollback` por task, o plano tem UMA seção `## Risks` global:
+- Impacto de compatibilidade (o que quebra fora da feature, se algo)
+- Condição de abort (quando parar em vez de improvisar — ex.: "se a migration X falhar em staging, abortar, não tentar reparo manual")
 
-### 8. Quiz curto (1 turn)
+Se não há risco sistêmico, escreva `Nenhum — risco isolado por task (ver rollbacks)`. Não invente riscos especulativos.
 
-Antes de fechar, mostre ao usuário em 1 mensagem:
+### 8. Escreva o PLAN.md
+
+Use [PLAN-TEMPLATE.md](PLAN-TEMPLATE.md) como esqueleto. Resultado final em `.plans/<feature>/PLAN.md`, salvo com `status: draft`.
+
+Antes de apresentar, **releia o arquivo salvo** e cheque: tasks cobrem os Goals? Cada task tem `acceptance` verificável? Tasks de risco têm `rollback`? `## Decisions` tem alternativa descartada? Não apresente um plano que você não auditou.
+
+### 9. Quiz + aprovação (1 turn)
+
+Apresente ao usuário em 1 mensagem:
 - Lista numerada de tasks (título + tipo + effort + 1 linha do que faz)
 - Esforço total estimado (soma dos S/M/L)
+- Decisões materiais fechadas (1 linha cada)
 - Pergunta: *"Granularidade ok? Alguma task deveria ser dividida ou fundida? Algum critério de aceite que vai falhar como `must_pass`?"*
 
-Itere se necessário.
+E finalize pedindo explicitamente: **`Approve` / `Request changes` / `Cancel`**.
+
+Depois pare. Não execute nenhuma task, não edite código, não rode comandos de implementação até o Approve explícito. Em `Request changes`, revise, re-audite e apresente de novo. Em `Cancel`, pare. No Approve, vire o frontmatter para `status: ready`.
+
+## Variantes (quando não é feature)
+
+O template default é implementação. Para os dois casos abaixo, adapte as seções — sem criar cerimônia nova:
+
+**Debug** (`type: debug` no frontmatter): troque `## Tasks` por hipóteses falsificáveis — cada item tem hipótese / observação necessária / evidência que confirma ou refuta. Must-Haves viram "reprodução + evidência de causa". O resto (Discovery, Risks, Reset Protocol) continua igual.
+
+**Migração/rollout** (`type: migration` no frontmatter): tasks viram fases com gates (fase N só começa se `<condição>`); `## Risks` ganha monitoramento + impacto visível ao usuário; cada fase tem `rollback` obrigatório.
+
+Se não é nenhum dos três (feature, debug, migração), o default de feature provavelmente serve — não invente um quarto template sem motivo real.
 
 ## Estrutura recomendada do diretório
 
@@ -131,18 +164,21 @@ Mau critério de aceite:
 - ❌ **Documentar coisa que CLAUDE.md já documenta** (DRY com o repo)
 - ❌ **Must-Haves de mais** (3-5 truths, não 20 — caso contrário não testamos no fim)
 - ❌ **Task com migration sem `rollback`** (o campo existe para te salvar às 23h de uma sexta)
+- ❌ **Decisão sem alternativa descartada** ("usamos X" sem dizer por que não Y — o tradeoff volta pra te morder no meio da execução)
+- ❌ **Discovery por resumo de busca** (listar fonte que você não abriu — recomendação vira chute com link bonito)
+- ❌ **Executar antes do Approve** (começar a task-01 "enquanto isso" — o gate existe porque replan é mais barato que rework)
 
 ## Plan Mode interaction
 
 Esta skill funciona bem dentro do Plan Mode do Claude Code. Se você está em plan mode:
 1. Faça toda exploração e discovery
-2. Apresente o PLAN.md ao usuário via `ExitPlanMode`
-3. Após aprovação, salve em `.plans/<feature>/PLAN.md` e sugira `/dev-coding`
+2. Escreva o PLAN.md (`status: draft`), re-audite, apresente via `ExitPlanMode`
+3. Após aprovação, vire para `status: ready` em `.plans/<feature>/PLAN.md` e sugira `/dev-coding`
 
-Se NÃO está em plan mode: escreva o arquivo direto e mostre resumo ao usuário.
+Se NÃO está em plan mode: escreva o arquivo (`status: draft`), re-audite, apresente o quiz + gate de aprovação — e só considere fechado após o Approve explícito.
 
 ## Próximo passo
 
-Após PLAN.md fechado:
+Após Approve (com `status: ready` já virado):
 
-> *"PLAN.md salvo em `.plans/<feature>/PLAN.md`. Pronto pra `/dev-coding` executar task-01? Você pode resetar contexto agora — o plano é auto-suficiente."*
+> *"PLAN.md aprovado e salvo em `.plans/<feature>/PLAN.md`. Pronto pra `/dev-coding` executar task-01? Você pode resetar contexto agora — o plano é auto-suficiente."*
